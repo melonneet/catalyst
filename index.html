@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📸 Mandarin Photo Captions - Turn Photos into Mandarin Learning</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📸 Mandarin Photo Captions</h1>
+            <p class="tagline">Turn your everyday photos into instant Mandarin captions!</p>
+        </header>
+
+        <div class="upload-section">
+            <div class="upload-box" id="uploadBox">
+                <input type="file" id="fileInput" accept="image/*">
+                <div class="upload-icon">📷</div>
+                <p class="upload-text">Click to upload or drag & drop</p>
+                <p class="upload-subtext">Your coffee, pet, desk, travel shot... anything!</p>
+            </div>
+        </div>
+
+        <div class="preview-section" id="previewSection">
+            <img id="photoPreview" class="photo-preview" alt="Your photo">
+            <div class="generating-text" id="generatingText">
+                ✨ Generating your personalized Mandarin captions...
+            </div>
+            <div class="captions-container" id="captionsContainer"></div>
+            <center>
+                <button class="new-photo-btn" onclick="resetUpload()">📸 Try Another Photo</button>
+            </center>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
