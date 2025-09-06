@@ -381,6 +381,118 @@
             background: #c53030;
         }
 
+        /* Learning History Styles */
+        .history-controls .btn {
+            transition: all 0.3s ease;
+        }
+
+        .history-controls .btn.active {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(72, 187, 120, 0.4);
+        }
+
+        .history-item-card {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid rgba(226, 232, 240, 0.6);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .history-item-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .history-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .history-item-type {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .history-item-time {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .history-item-content {
+            margin: 10px 0;
+        }
+
+        .history-item-title {
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .history-item-details {
+            color: #4a5568;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .history-item-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .history-item-actions .btn {
+            padding: 5px 10px;
+            font-size: 0.8rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.6);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(226, 232, 240, 0.4);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .empty-history {
+            text-align: center;
+            padding: 40px;
+            color: #a0aec0;
+        }
+
+        .empty-history-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
         .controls {
             display: flex;
             gap: 10px;
@@ -591,10 +703,52 @@
                     <p style="color: #a0aec0; text-align: center;">Search for a Chinese character or word to see its definition</p>
                 </div>
 
-                <div class="search-history" id="searchHistory" style="display: none;">
-                    <div class="history-title">Recent Searches</div>
-                    <div id="historyList"></div>
-                    <button class="clear-history" onclick="clearSearchHistory()">Clear History</button>
+            </div>
+        </div>
+
+        <!-- Learning History Section -->
+        <div class="feature-card" style="grid-column: 1 / -1; margin-top: 20px;">
+            <h2 class="feature-title">
+                <span class="feature-icon">📊</span>
+                Learning History & Progress
+            </h2>
+            <p style="margin-bottom: 20px; color: #718096;">Track your Chinese learning journey and see your progress</p>
+
+            <div class="history-controls" style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+                <button class="btn" onclick="showAllHistory()" id="allHistoryBtn">All Activities</button>
+                <button class="btn" onclick="showDictionaryHistory()" id="dictHistoryBtn">Dictionary Searches</button>
+                <button class="btn" onclick="showImageHistory()" id="imageHistoryBtn">Image Captions</button>
+                <button class="btn" onclick="showTTSHistory()" id="ttsHistoryBtn">Text-to-Speech</button>
+                <button class="btn" onclick="showProgressStats()" id="statsBtn">📈 Statistics</button>
+                <button class="btn" onclick="clearAllHistory()" style="background: linear-gradient(135deg, #e53e3e, #c53030);">🗑️ Clear All</button>
+            </div>
+
+            <div class="history-search-container" style="margin-bottom: 20px;">
+                <div class="search-container" style="max-width: 500px; margin: 0 auto; position: relative;">
+                    <input 
+                        type="text" 
+                        id="historySearch" 
+                        class="search-input" 
+                        placeholder="Search your learning history... (e.g., 你好, image, tts)"
+                        onkeypress="handleHistorySearch(event)"
+                        oninput="filterHistoryBySearch()"
+                    >
+                    <button class="search-btn" onclick="filterHistoryBySearch()">🔍</button>
+                    <button class="search-btn" onclick="clearHistorySearch()" style="right: 50px; background: linear-gradient(135deg, #e53e3e, #c53030);">✕</button>
+                </div>
+                <div style="text-align: center; margin-top: 10px;">
+                    <small style="color: #718096;">Search by Chinese characters, pinyin, English words, or activity type (dictionary, image, tts)</small>
+                </div>
+            </div>
+
+            <div class="history-stats" id="historyStats" style="display: none; background: rgba(247, 250, 252, 0.8); padding: 20px; border-radius: 15px; margin-bottom: 20px; backdrop-filter: blur(10px);">
+                <h3 style="margin-bottom: 15px; color: #2d3748;">Your Learning Statistics</h3>
+                <div id="statsContent"></div>
+            </div>
+
+            <div class="history-content" id="historyContent">
+                <div class="history-list" id="historyList">
+                    <p style="color: #a0aec0; text-align: center; padding: 40px;">Your learning history will appear here. Start using the features to build your progress!</p>
                 </div>
             </div>
         </div>
@@ -604,6 +758,9 @@
         let selectedVoice = 'female-standard';
         let currentUtterance = null;
         let searchHistory = JSON.parse(localStorage.getItem('chineseDictionaryHistory') || '[]');
+        let learningHistory = JSON.parse(localStorage.getItem('learningHistory') || '[]');
+        let currentFilter = 'all';
+        let currentSearchTerm = '';
 
         // Image Upload Functionality
         const uploadArea = document.getElementById('uploadArea');
@@ -686,6 +843,13 @@
                     <div class="pinyin-text">${randomCaption.pinyin}</div>
                     <button class="btn" onclick="speakCaption('${randomCaption.chinese}')" style="margin-top: 10px;">🔊 Listen to Caption</button>
                 `;
+                
+                // Add to learning history
+                addToLearningHistory('image', {
+                    chinese: randomCaption.chinese,
+                    pinyin: randomCaption.pinyin,
+                    imageUrl: img.src
+                });
             }, 2000);
         }
 
@@ -767,6 +931,14 @@
                 
                 displayDictionaryResult(dictionaryData, dictionaryData.source || 'fallback');
                 addToSearchHistory(searchTerm, dictionaryData.pinyin);
+                
+                // Add to learning history
+                addToLearningHistory('dictionary', {
+                    character: searchTerm,
+                    pinyin: dictionaryData.pinyin,
+                    definitions: dictionaryData.definitions,
+                    source: dictionaryData.source || 'fallback'
+                });
                 
             } catch (error) {
                 console.error('Dictionary search error:', error);
@@ -1375,14 +1547,331 @@
                 };
 
                 speechSynthesis.speak(currentUtterance);
+                
+                // Add to learning history
+                addToLearningHistory('tts', {
+                    text: textToSpeak,
+                    voice: selectedVoice,
+                    speed: parseFloat(document.getElementById('speedSlider').value)
+                });
             } else {
                 alert('Text-to-speech is not supported in your browser.');
             }
         }
 
+        // Learning History Functions
+        function addToLearningHistory(type, data) {
+            const historyItem = {
+                id: Date.now(),
+                type: type,
+                timestamp: new Date().toISOString(),
+                data: data
+            };
+            
+            learningHistory.unshift(historyItem);
+            
+            // Keep only last 100 items
+            if (learningHistory.length > 100) {
+                learningHistory = learningHistory.slice(0, 100);
+            }
+            
+            localStorage.setItem('learningHistory', JSON.stringify(learningHistory));
+            updateLearningHistoryDisplay();
+        }
+
+        function updateLearningHistoryDisplay() {
+            const historyList = document.getElementById('historyList');
+            let filteredHistory = filterHistory(learningHistory, currentFilter);
+            
+            // Apply search filter if there's a search term
+            if (currentSearchTerm) {
+                filteredHistory = searchInHistory(filteredHistory, currentSearchTerm);
+            }
+            
+            if (filteredHistory.length === 0) {
+                const emptyMessage = currentSearchTerm ? 
+                    `No activities found matching "${currentSearchTerm}"` : 
+                    `No ${currentFilter === 'all' ? 'activities' : currentFilter} found in your learning history.`;
+                
+                historyList.innerHTML = `
+                    <div class="empty-history">
+                        <div class="empty-history-icon">${currentSearchTerm ? '🔍' : '📚'}</div>
+                        <p>${emptyMessage}</p>
+                        <p style="font-size: 0.9rem; margin-top: 10px;">${currentSearchTerm ? 'Try a different search term or clear the search.' : 'Start using the features to build your progress!'}</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            historyList.innerHTML = filteredHistory.map(item => createHistoryItemHTML(item)).join('');
+        }
+
+        function filterHistory(history, filter) {
+            if (filter === 'all') return history;
+            return history.filter(item => item.type === filter);
+        }
+
+        function createHistoryItemHTML(item) {
+            const timeAgo = getTimeAgo(new Date(item.timestamp));
+            const typeInfo = getTypeInfo(item.type);
+            
+            return `
+                <div class="history-item-card">
+                    <div class="history-item-header">
+                        <span class="history-item-type">${typeInfo.icon} ${typeInfo.name}</span>
+                        <span class="history-item-time">${timeAgo}</span>
+                    </div>
+                    <div class="history-item-content">
+                        <div class="history-item-title">${getItemTitle(item)}</div>
+                        <div class="history-item-details">${getItemDetails(item)}</div>
+                    </div>
+                    <div class="history-item-actions">
+                        ${getItemActions(item)}
+                    </div>
+                </div>
+            `;
+        }
+
+        function getTypeInfo(type) {
+            const types = {
+                'dictionary': { name: 'Dictionary Search', icon: '📚' },
+                'image': { name: 'Image Caption', icon: '📸' },
+                'tts': { name: 'Text-to-Speech', icon: '🔊' }
+            };
+            return types[type] || { name: 'Activity', icon: '📝' };
+        }
+
+        function getItemTitle(item) {
+            switch(item.type) {
+                case 'dictionary':
+                    return `Searched for "${item.data.character}"`;
+                case 'image':
+                    return `Generated caption for image`;
+                case 'tts':
+                    return `Spoke: "${item.data.text.substring(0, 30)}${item.data.text.length > 30 ? '...' : ''}"`;
+                default:
+                    return 'Learning Activity';
+            }
+        }
+
+        function getItemDetails(item) {
+            switch(item.type) {
+                case 'dictionary':
+                    return `Pinyin: ${item.data.pinyin} | Found ${item.data.definitions.length} definition(s)`;
+                case 'image':
+                    return `Chinese: ${item.data.chinese} | Pinyin: ${item.data.pinyin}`;
+                case 'tts':
+                    return `Voice: ${item.data.voice} | Speed: ${item.data.speed}x`;
+                default:
+                    return 'Learning activity details';
+            }
+        }
+
+        function getItemActions(item) {
+            let actions = '';
+            
+            switch(item.type) {
+                case 'dictionary':
+                    actions += `<button class="btn" onclick="searchFromHistory('${item.data.character}')">Search Again</button>`;
+                    actions += `<button class="btn" onclick="speakText('${item.data.character}')">🔊 Speak</button>`;
+                    break;
+                case 'image':
+                    actions += `<button class="btn" onclick="speakText('${item.data.chinese}')">🔊 Speak Caption</button>`;
+                    break;
+                case 'tts':
+                    actions += `<button class="btn" onclick="speakText('${item.data.text}')">🔊 Speak Again</button>`;
+                    break;
+            }
+            
+            actions += `<button class="btn" onclick="removeHistoryItem(${item.id})" style="background: linear-gradient(135deg, #e53e3e, #c53030);">🗑️ Remove</button>`;
+            
+            return actions;
+        }
+
+        function getTimeAgo(date) {
+            const now = new Date();
+            const diffInSeconds = Math.floor((now - date) / 1000);
+            
+            if (diffInSeconds < 60) return 'Just now';
+            if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+            if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+            if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)}d ago`;
+            return date.toLocaleDateString();
+        }
+
+        function removeHistoryItem(id) {
+            learningHistory = learningHistory.filter(item => item.id !== id);
+            localStorage.setItem('learningHistory', JSON.stringify(learningHistory));
+            updateLearningHistoryDisplay();
+        }
+
+        // History Filter Functions
+        function showAllHistory() {
+            currentFilter = 'all';
+            updateActiveButton('allHistoryBtn');
+            updateLearningHistoryDisplay();
+        }
+
+        function showDictionaryHistory() {
+            currentFilter = 'dictionary';
+            updateActiveButton('dictHistoryBtn');
+            updateLearningHistoryDisplay();
+        }
+
+        function showImageHistory() {
+            currentFilter = 'image';
+            updateActiveButton('imageHistoryBtn');
+            updateLearningHistoryDisplay();
+        }
+
+        function showTTSHistory() {
+            currentFilter = 'tts';
+            updateActiveButton('ttsHistoryBtn');
+            updateLearningHistoryDisplay();
+        }
+
+        function updateActiveButton(activeId) {
+            document.querySelectorAll('.history-controls .btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(activeId).classList.add('active');
+        }
+
+        function showProgressStats() {
+            const statsContainer = document.getElementById('historyStats');
+            const statsContent = document.getElementById('statsContent');
+            
+            if (statsContainer.style.display === 'none') {
+                const stats = calculateLearningStats();
+                statsContent.innerHTML = createStatsHTML(stats);
+                statsContainer.style.display = 'block';
+                updateActiveButton('statsBtn');
+            } else {
+                statsContainer.style.display = 'none';
+                updateActiveButton('allHistoryBtn');
+            }
+        }
+
+        function calculateLearningStats() {
+            const totalActivities = learningHistory.length;
+            const dictionarySearches = learningHistory.filter(item => item.type === 'dictionary').length;
+            const imageCaptions = learningHistory.filter(item => item.type === 'image').length;
+            const ttsUsage = learningHistory.filter(item => item.type === 'tts').length;
+            
+            const uniqueWords = new Set(learningHistory
+                .filter(item => item.type === 'dictionary')
+                .map(item => item.data.character)
+            ).size;
+            
+            const lastWeek = learningHistory.filter(item => {
+                const itemDate = new Date(item.timestamp);
+                const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+                return itemDate > weekAgo;
+            }).length;
+            
+            return {
+                totalActivities,
+                dictionarySearches,
+                imageCaptions,
+                ttsUsage,
+                uniqueWords,
+                lastWeek
+            };
+        }
+
+        function createStatsHTML(stats) {
+            return `
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">${stats.totalActivities}</div>
+                        <div class="stat-label">Total Activities</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${stats.dictionarySearches}</div>
+                        <div class="stat-label">Dictionary Searches</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${stats.imageCaptions}</div>
+                        <div class="stat-label">Image Captions</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${stats.ttsUsage}</div>
+                        <div class="stat-label">TTS Sessions</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${stats.uniqueWords}</div>
+                        <div class="stat-label">Unique Words Learned</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${stats.lastWeek}</div>
+                        <div class="stat-label">Activities This Week</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function clearAllHistory() {
+            if (confirm('Are you sure you want to clear all learning history? This action cannot be undone.')) {
+                learningHistory = [];
+                localStorage.removeItem('learningHistory');
+                updateLearningHistoryDisplay();
+                document.getElementById('historyStats').style.display = 'none';
+            }
+        }
+
+        // History Search Functions
+        function handleHistorySearch(event) {
+            if (event.key === 'Enter') {
+                filterHistoryBySearch();
+            }
+        }
+
+        function filterHistoryBySearch() {
+            const searchInput = document.getElementById('historySearch');
+            currentSearchTerm = searchInput.value.trim().toLowerCase();
+            updateLearningHistoryDisplay();
+        }
+
+        function searchInHistory(history, searchTerm) {
+            if (!searchTerm) return history;
+            
+            return history.filter(item => {
+                const searchableText = getSearchableText(item).toLowerCase();
+                return searchableText.includes(searchTerm);
+            });
+        }
+
+        function getSearchableText(item) {
+            let text = '';
+            
+            switch(item.type) {
+                case 'dictionary':
+                    text = `${item.data.character} ${item.data.pinyin} ${item.data.definitions.map(d => d.meaning).join(' ')}`;
+                    break;
+                case 'image':
+                    text = `${item.data.chinese} ${item.data.pinyin}`;
+                    break;
+                case 'tts':
+                    text = item.data.text;
+                    break;
+            }
+            
+            // Add type name for searching by activity type
+            text += ` ${item.type} dictionary image tts`;
+            
+            return text;
+        }
+
+        function clearHistorySearch() {
+            document.getElementById('historySearch').value = '';
+            currentSearchTerm = '';
+            updateLearningHistoryDisplay();
+        }
+
         // Initialize search history display on page load
         document.addEventListener('DOMContentLoaded', function() {
             updateSearchHistoryDisplay();
+            updateLearningHistoryDisplay();
         });
     </script>
 </body>
