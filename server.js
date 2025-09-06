@@ -22,8 +22,7 @@ const upload = multer({
 
 // API configuration - Multiple API keys for redundancy
 const OPENROUTER_API_KEYS = [
-    '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',
-    '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'
+    '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'
 ];
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 
@@ -86,6 +85,11 @@ async function makeApiRequestWithFallback(requestBody, maxRetries = OPENROUTER_A
         try {
             const currentKey = getCurrentApiKey();
             console.log(`🔑 Using API key ${currentApiKeyIndex + 1} (attempt ${attempt + 1}/${maxRetries})`);
+            console.log(`🔗 Connecting to: ${OPENROUTER_API_URL}`);
+            
+            // Add timeout to prevent hanging requests
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
             
             const response = await fetch(OPENROUTER_API_URL, {
                 method: 'POST',
@@ -95,8 +99,13 @@ async function makeApiRequestWithFallback(requestBody, maxRetries = OPENROUTER_A
                     'HTTP-Referer': 'http://localhost:3000',
                     'X-Title': 'Mandarin Photo Captions'
                 },
-                body: JSON.stringify(requestBody)
+                body: JSON.stringify(requestBody),
+                signal: controller.signal
             });
+            
+            clearTimeout(timeoutId);
+            
+            console.log(`📡 Response status: ${response.status}`);
             
             if (response.ok) {
                 const data = await response.json();
@@ -124,23 +133,62 @@ async function makeApiRequestWithFallback(requestBody, maxRetries = OPENROUTER_A
                 return data;
             } else {
                 const errorText = await response.text();
-                console.warn(`⚠️ API key ${currentApiKeyIndex + 1} failed: ${response.status} - ${errorText}`);
-                lastError = new Error(`API request failed: ${response.status} ${response.statusText} - ${errorText}`);
+                console.error(`❌ API Response Error:`);
+                console.error(`   Status: ${response.status} ${response.statusText}`);
+                console.error(`   Body: ${errorText}`);
+                
+                // Check for specific error types
+                if (response.status === 401) {
+                    console.error(`❌ Authentication failed - API key may be invalid`);
+                    lastError = new Error('Invalid API key - please check your OpenRouter API key');
+                } else if (response.status === 429) {
+                    console.error(`❌ Rate limit exceeded`);
+                    lastError = new Error('Rate limit exceeded - please wait before trying again');
+                } else if (response.status === 402) {
+                    console.error(`❌ Insufficient credits`);
+                    lastError = new Error('Insufficient OpenRouter credits - please add credits to your account');
+                } else {
+                    lastError = new Error(`API request failed: ${response.status} ${response.statusText} - ${errorText}`);
+                }
                 
                 if (attempt < maxRetries - 1) {
                     switchToNextApiKey();
                 }
             }
         } catch (error) {
-            console.warn(`⚠️ API key ${currentApiKeyIndex + 1} error:`, error);
-            lastError = error;
+            console.error(`❌ Network/Connection Error:`, error);
+            console.error(`   Error Type: ${error.name}`);
+            console.error(`   Error Message: ${error.message}`);
+            console.error(`   Error Code: ${error.code}`);
+            
+            // Enhanced error detection
+            if (error.name === 'AbortError') {
+                lastError = new Error('Request timeout - API request took too long');
+            } else if (error.code === 'ECONNREFUSED') {
+                console.error(`❌ Connection refused - cannot reach OpenRouter API`);
+                lastError = new Error('Cannot connect to OpenRouter API - check your internet connection');
+            } else if (error.code === 'ENOTFOUND') {
+                console.error(`❌ DNS lookup failed - cannot resolve openrouter.ai`);
+                lastError = new Error('Cannot reach OpenRouter servers - check your internet connection');
+            } else if (error.code === 'ETIMEDOUT') {
+                console.error(`❌ Connection timeout`);
+                lastError = new Error('Connection to OpenRouter timed out');
+            } else if (error.message.includes('fetch')) {
+                console.error(`❌ Fetch failed - likely a network issue`);
+                lastError = new Error('Network request failed - check your connection');
+            } else {
+                lastError = error;
+            }
             
             if (attempt < maxRetries - 1) {
+                console.log(`⏳ Waiting 2 seconds before retry...`);
                 switchToNextApiKey();
+                await new Promise(resolve => setTimeout(resolve, 2000));
             }
         }
     }
     
+    console.error(`❌ All API attempts failed. Last error:`, lastError);
     throw lastError || new Error('All API keys failed');
 }
 
@@ -263,7 +311,7 @@ function validateCaptions(captions, analysis) {
 }
 
 // Analyze image with caching
-async function analyzeImage(imageBuffer) {
+async function analyzeImage(imageBuffer, mimeType = 'image/jpeg') {
     try {
         console.log('🔍 Analyzing image content...');
         
@@ -328,7 +376,7 @@ async function analyzeImage(imageBuffer) {
                         {
                             type: 'image_url',
                             image_url: {
-                                url: `data:image/jpeg;base64,${base64Image}`
+                                url: `data:${mimeType};base64,${base64Image}`
                             }
                         }
                     ]
@@ -341,7 +389,9 @@ async function analyzeImage(imageBuffer) {
             presence_penalty: 0.1
         };
 
+        console.log('🔍 Making API request for image analysis...');
         const data = await makeApiRequestWithFallback(requestBody);
+        console.log('✅ API request successful, processing response...');
         const analysisText = data.choices[0].message.content;
         
         let analysis;
@@ -488,7 +538,9 @@ async function generateChineseDescriptions(analysis) {
             presence_penalty: 0.1
         };
 
+        console.log('🔍 Making API request for caption generation...');
         const data = await makeApiRequestWithFallback(requestBody);
+        console.log('✅ Caption API request successful, processing response...');
         const responseText = data.choices[0].message.content;
         
         let result;
@@ -564,7 +616,13 @@ app.get('/api/usage', (req, res) => {
 // Process image and generate captions
 app.post('/api/analyze-image', upload.single('image'), async (req, res) => {
     try {
+        console.log('🔍 Received request to /api/analyze-image');
+        console.log('🔍 Request headers:', req.headers);
+        console.log('🔍 Request body keys:', Object.keys(req.body || {}));
+        console.log('🔍 Request file:', req.file ? 'Present' : 'Missing');
+        
         if (!req.file) {
+            console.error('❌ No image file provided in request');
             return res.status(400).json({ error: 'No image file provided' });
         }
 
@@ -581,7 +639,7 @@ app.post('/api/analyze-image', upload.single('image'), async (req, res) => {
         }
         
         // Analyze image
-        const analysis = await analyzeImage(req.file.buffer);
+        const analysis = await analyzeImage(req.file.buffer, req.file.mimetype);
         
         // Generate captions
         const captions = await generateChineseDescriptions(analysis);
@@ -609,6 +667,15 @@ app.post('/api/analyze-image', upload.single('image'), async (req, res) => {
         } else if (error.message.includes('All API keys failed')) {
             errorMessage = 'Service temporarily unavailable';
             technicalDetails = 'All AI service endpoints are currently unavailable.';
+        } else if (error.message.includes('rate limit') || error.message.includes('quota')) {
+            errorMessage = 'Service temporarily unavailable';
+            technicalDetails = 'API rate limit exceeded. Please try again in a few minutes.';
+        } else if (error.message.includes('timeout')) {
+            errorMessage = 'Request timeout';
+            technicalDetails = 'The request took too long to process. Please try again.';
+        } else if (error.message.includes('network') || error.message.includes('ECONNREFUSED')) {
+            errorMessage = 'Network error';
+            technicalDetails = 'Unable to connect to external services. Please check your internet connection.';
         }
         
         res.status(500).json({ 
@@ -646,6 +713,38 @@ app.post('/api/clear-cache', (req, res) => {
     } catch (error) {
         console.error('Error clearing cache:', error);
         res.status(500).json({ error: 'Failed to clear cache' });
+    }
+});
+
+// Test API connectivity endpoint
+app.get('/api/test', async (req, res) => {
+    try {
+        console.log('🧪 Testing API connectivity...');
+        
+        const testRequest = {
+            model: 'openai/gpt-4o-mini',
+            messages: [
+                {
+                    role: 'user',
+                    content: 'Say "API is working"'
+                }
+            ],
+            max_tokens: 10
+        };
+        
+        const result = await makeApiRequestWithFallback(testRequest, 1);
+        
+        res.json({
+            success: true,
+            message: 'API connection successful',
+            response: result.choices[0].message.content
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'API connection failed',
+            error: error.message
+        });
     }
 });
 
