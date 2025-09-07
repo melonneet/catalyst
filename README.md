@@ -1,518 +1,210 @@
-# catalyst
-<<<<<<< HEAD
-fffff
-=======
+# 📸 Mandarin Photo Captions - Enhanced Version
 
+An AI-powered application that generates personalized Mandarin captions for your photos with secure backend architecture, caching, offline support, and user feedback system.
 
-# Hi guys this is Simpson
->>>>>>> 13084591044a8ae0b81d17afc357427be2a6fc96
+## ✨ New Features
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📸 Mandarin Photo Captions</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+### 🔐 Security Improvements
+- **API Keys Secured**: All API keys are now stored securely on the backend server
+- **No Client-Side Exposure**: API keys are never exposed to the client-side code
+- **Secure Communication**: All API requests go through the backend server
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
+### 💰 Cost Management
+- **Usage Tracking**: Monitor API usage and costs
+- **Cost Estimation**: Track estimated costs for each request
+- **Daily Usage Reports**: View usage statistics by day
+- **API Key Management**: Secure API key handling on backend
 
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
+### 🚀 Performance Enhancements
+- **Image Caching**: Similar images are cached to reduce API calls
+- **Hash-Based Caching**: Uses SHA-256 hashing for efficient cache lookups
+- **24-Hour Cache**: Cached responses are valid for 24 hours
+- **Cache Statistics**: Track cache hit rates and performance
 
-        .header {
-            background: linear-gradient(135deg, #ff6b6b, #ffa726);
-            color: white;
-            padding: 40px;
-            text-align: center;
-        }
+### 📱 Progressive Enhancement
+- **Offline Support**: Graceful handling when offline
+- **Cached Responses**: Use cached data when offline
+- **Connection Status**: Real-time online/offline indicators
+- **Fallback Mechanisms**: Multiple fallback strategies
 
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
+### ⭐ User Feedback System
+- **Caption Rating**: 5-star rating system for generated captions
+- **Feedback Collection**: Optional text feedback for improvements
+- **Quality Tracking**: Monitor caption quality over time
+- **User Experience**: Improved user engagement
 
-        .header p {
-            font-size: 1.2rem;
-            opacity: 0.9;
-            font-style: italic;
-        }
+## 🚀 Quick Start
 
-        .content {
-            padding: 40px;
-        }
+### Prerequisites
+- Node.js (version 14 or higher)
+- npm or yarn package manager
 
-        .upload-section {
-            text-align: center;
-            margin-bottom: 40px;
-        }
+### Installation
 
-        .upload-box {
-            border: 3px dashed #ddd;
-            border-radius: 15px;
-            padding: 60px 20px;
-            margin-bottom: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background: #fafafa;
-        }
+1. **Clone or download the project**
+   ```bash
+   cd /Users/charis/catalyst
+   ```
 
-        .upload-box:hover {
-            border-color: #667eea;
-            background: #f0f4ff;
-        }
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-        .upload-box.dragover {
-            border-color: #667eea;
-            background: #f0f4ff;
-            transform: scale(1.02);
-        }
+3. **Start the server**
+   ```bash
+   npm start
+   ```
 
-        .upload-icon {
-            font-size: 4rem;
-            margin-bottom: 20px;
-            color: #667eea;
-        }
+4. **Open your browser**
+   Navigate to `http://localhost:3000`
 
-        .upload-text {
-            font-size: 1.3rem;
-            color: #666;
-            margin-bottom: 10px;
-        }
+### Development Mode
+For development with auto-restart:
+```bash
+npm run dev
+```
 
-        .upload-subtext {
-            color: #999;
-            font-size: 1rem;
-        }
+## 🏗️ Architecture
 
-        #fileInput {
-            display: none;
-        }
+### Backend (server.js)
+- **Express.js Server**: Handles API requests and file uploads
+- **Secure API Management**: Manages OpenAI API key securely
+- **Usage Tracking**: Monitors costs and usage patterns
+- **Image Caching**: Server-side caching with hash-based storage
+- **File Upload**: Handles image uploads with multer
 
-        .photo-preview {
-            display: none;
-            text-align: center;
-            margin-bottom: 30px;
-        }
+### Frontend (app.js)
+- **Progressive Web App**: Works offline with cached data
+- **Real-time Status**: Shows connection and cache status
+- **User Feedback**: Rating and feedback collection system
+- **Local Storage**: Client-side caching and usage tracking
 
-        .photo-preview img {
-            max-width: 100%;
-            max-height: 300px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-        }
+### Key Endpoints
+- `POST /api/analyze-image` - Analyze image and generate captions
+- `POST /api/rate-caption` - Submit caption ratings and feedback
+- `GET /api/usage` - Get usage statistics
+- `POST /api/clear-cache` - Clear server cache
 
-        .new-photo-btn {
-            background: #667eea;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 1rem;
-        }
+## 📊 Usage Statistics
 
-        .captions-section {
-            display: none;
-        }
+The application tracks:
+- Total API requests
+- Cache hit rates
+- Cost estimates
+- Daily usage patterns
+- API usage patterns
+- User ratings and feedback
 
-        .caption-card {
-            background: #f8f9ff;
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 20px;
-            border-left: 5px solid #667eea;
-            transition: all 0.3s ease;
-        }
+## 🔧 Configuration
 
-        .caption-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        }
+### API Keys
+Set your OpenAI API key in the `.env` file:
+```bash
+OPENAI_API_KEY=your_openai_api_key_here
+```
 
-        .chinese-text {
-            font-size: 1.8rem;
-            color: #333;
-            margin-bottom: 10px;
-            font-weight: 500;
-        }
+### Cache Settings
+Modify cache expiry time in both server and client:
+```javascript
+// Server (server.js)
+const CACHE_EXPIRY = 24 * 60 * 60 * 1000; // 24 hours
 
-        .pinyin {
-            font-size: 1.2rem;
-            color: #667eea;
-            margin-bottom: 8px;
-            font-style: italic;
-        }
+// Client (app.js)
+const CACHE_EXPIRY = 24 * 60 * 60 * 1000; // 24 hours
+```
 
-        .english {
-            font-size: 1.1rem;
-            color: #666;
-            margin-bottom: 15px;
-        }
+## 🛡️ Security Features
 
-        .audio-btn {
-            background: linear-gradient(45deg, #ff6b6b, #ffa726);
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            margin-right: 10px;
-            transition: all 0.3s ease;
-        }
+1. **API Key Protection**: Keys stored only on server
+2. **Request Validation**: Input validation and sanitization
+3. **Error Handling**: Secure error messages without sensitive data
+4. **Rate Limiting**: Built-in usage tracking and limits
+5. **File Upload Security**: File type and size validation
 
-        .audio-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(255,107,107,0.3);
-        }
+## 📱 Offline Support
 
-        .dictionary-btn {
-            background: #4CAF50;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
-        }
+- **Cached Responses**: Previously analyzed images work offline
+- **Connection Detection**: Automatic online/offline detection
+- **Graceful Degradation**: Clear error messages when offline
+- **Local Storage**: Persistent cache across browser sessions
 
-        .dictionary-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(76,175,80,0.3);
-        }
+## 🎯 User Experience
 
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 40px;
-        }
+- **Real-time Feedback**: Immediate rating and feedback submission
+- **Visual Indicators**: Clear status indicators for connection and cache
+- **Responsive Design**: Works on desktop and mobile devices
+- **Accessibility**: Screen reader friendly with proper ARIA labels
 
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
+## 🔍 Monitoring
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+### Usage Dashboard
+Access usage statistics at `/api/usage`:
+```json
+{
+  "totalRequests": 150,
+  "totalCost": 0.45,
+  "requestsByKey": {
+    "key_1": 75,
+    "key_2": 75
+  },
+  "dailyUsage": {
+    "2024-01-15": {
+      "requests": 25,
+      "cost": 0.08
+    }
+  },
+  "cacheSize": 45
+}
+```
 
-        .dictionary-popup {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
+### Cache Management
+- View cache statistics in the usage dashboard
+- Clear cache via `/api/clear-cache` endpoint
+- Monitor cache hit rates for performance optimization
 
-        .dictionary-content {
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            max-width: 500px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
+## 🚀 Deployment
 
-        .close-btn {
-            float: right;
-            font-size: 2rem;
-            cursor: pointer;
-            color: #999;
-        }
+### Environment Variables
+Set these environment variables for production:
+```bash
+PORT=3000
+NODE_ENV=production
+```
 
-        .word-entry {
-            margin-bottom: 15px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #eee;
-        }
+### Production Considerations
+- Use a reverse proxy (nginx) for SSL termination
+- Set up proper logging and monitoring
+- Configure backup strategies for usage data
+- Implement proper error tracking
 
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 2rem;
-            }
-            
-            .content {
-                padding: 20px;
-            }
-            
-            .upload-box {
-                padding: 40px 20px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>📸 Mandarin Photo Captions</h1>
-            <p>Turn your everyday photos into instant Mandarin captions</p>
-        </div>
+## 📈 Performance Tips
 
-        <div class="content">
-            <div class="upload-section">
-                <div class="upload-box" id="uploadBox">
-                    <div class="upload-icon">📷</div>
-                    <div class="upload-text">Upload or drop a photo here</div>
-                    <div class="upload-subtext">Your meal, pet, desk, travel shot - anything!</div>
-                </div>
-                <input type="file" id="fileInput" accept="image/*">
-            </div>
+1. **Cache Optimization**: Monitor cache hit rates and adjust expiry times
+2. **API Key Management**: Ensure your OpenAI API key has sufficient credits
+3. **Image Compression**: Consider client-side image compression
+4. **CDN Integration**: Use CDN for static assets in production
 
-            <div class="photo-preview" id="photoPreview">
-                <img id="previewImg" src="" alt="Uploaded photo">
-                <br>
-                <button class="new-photo-btn" onclick="resetUpload()">📷 Upload New Photo</button>
-            </div>
+## 🐛 Troubleshooting
 
-            <div class="loading" id="loading">
-                <div class="spinner"></div>
-                <p>Generating your Mandarin captions... 🎯</p>
-            </div>
+### Common Issues
 
-            <div class="captions-section" id="captionsSection">
-                <div id="captionsContainer"></div>
-            </div>
-        </div>
-    </div>
+1. **API Key Errors**: Check that API keys are valid and have sufficient credits
+2. **Cache Issues**: Clear browser cache and server cache if needed
+3. **Upload Failures**: Check file size limits and supported formats
+4. **Offline Mode**: Ensure cached responses are available for offline use
 
-    <!-- Dictionary Popup -->
-    <div class="dictionary-popup" id="dictionaryPopup">
-        <div class="dictionary-content">
-            <span class="close-btn" onclick="closeDictionary()">&times;</span>
-            <h3>📖 Dictionary</h3>
-            <div id="dictionaryContent"></div>
-        </div>
-    </div>
+### Debug Mode
+Enable debug logging by checking the browser console for detailed information.
 
-    <script>
-        // Sample captions database organized by detected objects
-        const captionTemplates = {
-            coffee: [
-                { chinese: "我在喝咖啡。", pinyin: "wǒ zài hē kāfēi", english: "I'm drinking coffee." },
-                { chinese: "今天的咖啡很香。", pinyin: "jīntiān de kāfēi hěn xiāng", english: "Today's coffee smells good." },
-                { chinese: "我喜欢早上喝一杯咖啡。", pinyin: "wǒ xǐhuān zǎoshang hē yì bēi kāfēi", english: "I like drinking a cup of coffee in the morning." }
-            ],
-            food: [
-                { chinese: "这个菜很好吃。", pinyin: "zhège cài hěn hǎochī", english: "This dish is very delicious." },
-                { chinese: "我今天吃了很多。", pinyin: "wǒ jīntiān chī le hěnduō", english: "I ate a lot today." },
-                { chinese: "这是我最喜欢的食物。", pinyin: "zhè shì wǒ zuì xǐhuān de shíwù", english: "This is my favorite food." }
-            ],
-            cat: [
-                { chinese: "我的猫很可爱。", pinyin: "wǒ de māo hěn kě'ài", english: "My cat is very cute." },
-                { chinese: "猫咪在睡觉。", pinyin: "māomī zài shuìjiào", english: "The kitty is sleeping." },
-                { chinese: "我喜欢和猫玩。", pinyin: "wǒ xǐhuān hé māo wán", english: "I like playing with cats." }
-            ],
-            dog: [
-                { chinese: "我的狗很聪明。", pinyin: "wǒ de gǒu hěn cōngmíng", english: "My dog is very smart." },
-                { chinese: "狗狗想要出去走走。", pinyin: "gǒugǒu xiǎng yào chūqù zǒuzǒu", english: "The doggie wants to go for a walk." },
-                { chinese: "我每天遛狗。", pinyin: "wǒ měitiān liùgǒu", english: "I walk the dog every day." }
-            ],
-            default: [
-                { chinese: "这个很有趣。", pinyin: "zhège hěn yǒuqù", english: "This is very interesting." },
-                { chinese: "今天天气很好。", pinyin: "jīntiān tiānqì hěn hǎo", english: "The weather is very nice today." },
-                { chinese: "我觉得这个很漂亮。", pinyin: "wǒ juéde zhège hěn piàoliang", english: "I think this is very beautiful." }
-            ]
-        };
+## 📄 License
 
-        // Dictionary data
-        const dictionary = {
-            "我": { pinyin: "wǒ", english: "I, me" },
-            "在": { pinyin: "zài", english: "at, in, on (indicating ongoing action)" },
-            "喝": { pinyin: "hē", english: "to drink" },
-            "咖啡": { pinyin: "kāfēi", english: "coffee" },
-            "今天": { pinyin: "jīntiān", english: "today" },
-            "的": { pinyin: "de", english: "possessive particle" },
-            "很": { pinyin: "hěn", english: "very" },
-            "香": { pinyin: "xiāng", english: "fragrant, aromatic" },
-            "喜欢": { pinyin: "xǐhuān", english: "to like" },
-            "早上": { pinyin: "zǎoshang", english: "morning" },
-            "一杯": { pinyin: "yì bēi", english: "one cup" }
-        };
+MIT License - feel free to use and modify as needed.
 
-        // File upload handling
-        const uploadBox = document.getElementById('uploadBox');
-        const fileInput = document.getElementById('fileInput');
-        const photoPreview = document.getElementById('photoPreview');
-        const previewImg = document.getElementById('previewImg');
-        const loading = document.getElementById('loading');
-        const captionsSection = document.getElementById('captionsSection');
+## 🤝 Contributing
 
-        uploadBox.addEventListener('click', () => fileInput.click());
-        uploadBox.addEventListener('dragover', handleDragOver);
-        uploadBox.addEventListener('dragleave', handleDragLeave);
-        uploadBox.addEventListener('drop', handleDrop);
-        fileInput.addEventListener('change', handleFileSelect);
+Contributions are welcome! Please feel free to submit issues and pull requests.
 
-        function handleDragOver(e) {
-            e.preventDefault();
-            uploadBox.classList.add('dragover');
-        }
+---
 
-        function handleDragLeave(e) {
-            e.preventDefault();
-            uploadBox.classList.remove('dragover');
-        }
-
-        function handleDrop(e) {
-            e.preventDefault();
-            uploadBox.classList.remove('dragover');
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                processFile(files[0]);
-            }
-        }
-
-        function handleFileSelect(e) {
-            const files = e.target.files;
-            if (files.length > 0) {
-                processFile(files[0]);
-            }
-        }
-
-        function processFile(file) {
-            if (!file.type.startsWith('image/')) {
-                alert('Please upload an image file!');
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                previewImg.src = e.target.result;
-                
-                // Hide upload section, show preview
-                document.querySelector('.upload-section').style.display = 'none';
-                photoPreview.style.display = 'block';
-                
-                // Show loading
-                loading.style.display = 'block';
-                captionsSection.style.display = 'none';
-                
-                // Simulate AI processing
-                setTimeout(() => {
-                    generateCaptions(file.name);
-                }, 2000);
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function generateCaptions(filename) {
-            // Simple object detection simulation based on filename
-            let detectedObject = 'default';
-            const name = filename.toLowerCase();
-            
-            if (name.includes('coffee') || name.includes('cafe')) {
-                detectedObject = 'coffee';
-            } else if (name.includes('cat') || name.includes('kitty')) {
-                detectedObject = 'cat';
-            } else if (name.includes('dog') || name.includes('puppy')) {
-                detectedObject = 'dog';
-            } else if (name.includes('food') || name.includes('meal') || name.includes('lunch') || name.includes('dinner')) {
-                detectedObject = 'food';
-            }
-
-            const captions = captionTemplates[detectedObject] || captionTemplates.default;
-            displayCaptions(captions);
-        }
-
-        function displayCaptions(captions) {
-            loading.style.display = 'none';
-            captionsSection.style.display = 'block';
-            
-            const container = document.getElementById('captionsContainer');
-            container.innerHTML = '';
-            
-            captions.forEach((caption, index) => {
-                const card = document.createElement('div');
-                card.className = 'caption-card';
-                card.innerHTML = `
-                    <div class="chinese-text">${caption.chinese}</div>
-                    <div class="pinyin">${caption.pinyin}</div>
-                    <div class="english">${caption.english}</div>
-                    <button class="audio-btn" onclick="playAudio('${caption.chinese}')">🔊 Listen</button>
-                    <button class="dictionary-btn" onclick="showDictionary('${caption.chinese}')">📖 Dictionary</button>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function playAudio(text) {
-            // Simulate text-to-speech (in real app, would use Web Speech API or external service)
-            alert(`🔊 Playing: "${text}"\n\n(In the real app, this would use text-to-speech to pronounce the Mandarin!)`);
-        }
-
-        function showDictionary(sentence) {
-            const popup = document.getElementById('dictionaryPopup');
-            const content = document.getElementById('dictionaryContent');
-            
-            // Parse characters from sentence and show definitions
-            const characters = Array.from(sentence).filter(char => dictionary[char]);
-            
-            content.innerHTML = '';
-            characters.forEach(char => {
-                if (dictionary[char]) {
-                    const entry = document.createElement('div');
-                    entry.className = 'word-entry';
-                    entry.innerHTML = `
-                        <strong style="font-size: 1.3rem; color: #333;">${char}</strong><br>
-                        <span style="color: #667eea; font-style: italic;">${dictionary[char].pinyin}</span><br>
-                        <span style="color: #666;">${dictionary[char].english}</span>
-                    `;
-                    content.appendChild(entry);
-                }
-            });
-            
-            popup.style.display = 'flex';
-        }
-
-        function closeDictionary() {
-            document.getElementById('dictionaryPopup').style.display = 'none';
-        }
-
-        function resetUpload() {
-            document.querySelector('.upload-section').style.display = 'block';
-            photoPreview.style.display = 'none';
-            captionsSection.style.display = 'none';
-            loading.style.display = 'none';
-            fileInput.value = '';
-        }
-
-        // Close dictionary when clicking outside
-        document.getElementById('dictionaryPopup').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeDictionary();
-            }
-        });
-    </script>
-</body>
-</html>
+**Note**: This enhanced version provides significant improvements in security, performance, and user experience while maintaining the core functionality of generating personalized Mandarin captions for photos.

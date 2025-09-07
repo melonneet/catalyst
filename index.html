@@ -3,37 +3,190 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📸 Mandarin Photo Captions - Turn Photos into Mandarin Learning</title>
+    <title>中文学习 - Road to H1 Chinese - Mandarin Edition</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>📸 Mandarin Photo Captions</h1>
-            <p class="tagline">Turn your everyday photos into instant Mandarin captions!</p>
-        </header>
-
-        <div class="upload-section">
-            <div class="upload-box" id="uploadBox">
-                <input type="file" id="fileInput" accept="image/*">
-                <div class="upload-icon">📷</div>
-                <p class="upload-text">Click to upload or drag & drop</p>
-                <p class="upload-subtext">Your coffee, pet, desk, travel shot... anything!</p>
-            </div>
-        </div>
-
-        <div class="preview-section" id="previewSection">
-            <img id="photoPreview" class="photo-preview" alt="Your photo">
-            <div class="generating-text" id="generatingText">
-                ✨ Generating your personalized Mandarin captions...
-            </div>
-            <div class="captions-container" id="captionsContainer"></div>
-            <center>
-                <button class="new-photo-btn" onclick="resetUpload()">📸 Try Another Photo</button>
-            </center>
-        </div>
+    <!-- Dark Mode Toggle -->
+    <div class="theme-toggle" onclick="toggleTheme()" title="Toggle dark mode">
+        <span class="theme-toggle-icon">🌙</span>
     </div>
 
+    <div class="container">
+        <div class="header">
+            <h1>Road to H1 Chinese - Mandarin Edition</h1>
+            <div class="chinese-title">中文学习中心</div>
+            <p>Advanced AI-powered tools for university students learning Chinese</p>
+        </div>
+
+        <div class="main-content">
+            <!-- Image to Caption Section -->
+            <div class="feature-card">
+                <h2 class="feature-title">
+                    <span class="feature-icon">📸</span>
+                    Image to Chinese Caption
+                </h2>
+                <p style="margin-bottom: 20px; color: #718096;">Upload an image and get Chinese descriptions with pinyin pronunciation</p>
+                
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📁</div>
+                    <p style="margin-bottom: 10px;"><strong>Click to upload</strong> or drag and drop an image here</p>
+                    <p style="font-size: 0.9rem; color: #a0aec0;">Supported formats: JPG, PNG, WebP</p>
+                    <input type="file" id="imageInput" class="file-input" accept="image/*">
+                </div>
+
+                <div id="imagePreview"></div>
+
+                <div class="loading" id="captionLoading">
+                    <div class="spinner"></div>
+                    <p>Analyzing image and generating Chinese caption...</p>
+                </div>
+
+                <div class="result-area" id="captionResult">
+                    <p style="color: #a0aec0; text-align: center;">Upload an image to see the Chinese caption here</p>
+                </div>
+
+                <button class="btn" onclick="generateCaption()">Generate Caption</button>
+            </div>
+
+            <!-- Text to Speech Section -->
+            <div class="feature-card">
+                <h2 class="feature-title">
+                    <span class="feature-icon">🔊</span>
+                    Chinese Text to Speech
+                </h2>
+                <p style="margin-bottom: 20px; color: #718096;">Enter Chinese text and listen to native Mandarin pronunciation</p>
+
+                <textarea 
+                    id="ttsText" 
+                    class="text-input" 
+                    placeholder="输入中文文本... (Enter Chinese text here)"
+                >你好，欢迎来到中文学习中心！</textarea>
+
+                <div class="tts-section">
+                    <h3 style="margin-bottom: 15px; color: #2d3748;">Choose Voice Style:</h3>
+                    <div class="voice-selector">
+                        <div class="voice-option selected" data-voice="female-standard">
+                            <div class="voice-name">标准普通话 (Standard Mandarin)</div>
+                            <div class="voice-description">Clear, professional Mandarin</div>
+                        </div>
+                        <div class="voice-option" data-voice="male-standard">
+                            <div class="voice-name">标准粤语 (Standard Cantonese)</div>
+                            <div class="voice-description">Clear, professional Cantonese</div>
+                        </div>
+                    </div>
+
+                    <div class="controls">
+                        <button class="btn" onclick="speakText()">🔊 Speak</button>
+                        <button class="btn" onclick="stopSpeaking()">⏹ Stop</button>
+                        <div class="speed-control">
+                            <label for="speedSlider">Speed:</label>
+                            <input type="range" id="speedSlider" class="speed-slider" min="0.5" max="2" step="0.1" value="1">
+                            <span id="speedValue">1.0x</span>
+                        </div>
+                    </div>
+
+                    <div class="loading" id="ttsLoading">
+                        <div class="spinner"></div>
+                        <p>Generating speech...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chinese Dictionary Section -->
+            <div class="feature-card">
+                <h2 class="feature-title">
+                    <span class="feature-icon">📚</span>
+                    Chinese Dictionary
+                </h2>
+                <p style="margin-bottom: 20px; color: #718096;">Search Chinese characters and words with detailed definitions and pronunciations</p>
+
+                <div class="search-container">
+                    <input 
+                        type="text" 
+                        id="dictionarySearch" 
+                        class="search-input" 
+                        placeholder="输入汉字或拼音... (Enter Chinese characters or pinyin)"
+                        onkeypress="handleDictionarySearch(event)"
+                    >
+                    <button class="search-btn" onclick="searchDictionary()">🔍</button>
+                </div>
+
+                <div style="margin: 15px 0; text-align: center;">
+                    <p style="font-size: 0.9rem; color: #718096; margin-bottom: 10px;">Try these sample words:</p>
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;">
+                        <button class="btn" onclick="searchSample('你好')" style="padding: 5px 10px; font-size: 0.8rem;">你好</button>
+                        <button class="btn" onclick="searchSample('学习')" style="padding: 5px 10px; font-size: 0.8rem;">学习</button>
+                        <button class="btn" onclick="searchSample('大学')" style="padding: 5px 10px; font-size: 0.8rem;">大学</button>
+                        <button class="btn" onclick="searchSample('中国')" style="padding: 5px 10px; font-size: 0.8rem;">中国</button>
+                        <button class="btn" onclick="searchSample('老师')" style="padding: 5px 10px; font-size: 0.8rem;">老师</button>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <button class="btn" onclick="testWebCrawling()" style="padding: 8px 15px; font-size: 0.8rem; background: linear-gradient(135deg, #48bb78, #38a169);">
+                            🌐 Test Web Crawling
+                        </button>
+                    </div>
+                </div>
+
+                <div class="loading" id="dictionaryLoading">
+                    <div class="spinner"></div>
+                    <p id="loadingText">Searching dictionary...</p>
+                </div>
+
+                <div class="dictionary-result" id="dictionaryResult">
+                    <p style="color: #a0aec0; text-align: center;">Search for a Chinese character or word to see its definition</p>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Learning History Section -->
+        <div class="feature-card" style="grid-column: 1 / -1; margin-top: 20px;">
+            <h2 class="feature-title">
+                <span class="feature-icon">📊</span>
+                Learning History & Progress
+            </h2>
+            <p style="margin-bottom: 20px; color: #718096;">Track your Chinese learning journey and see your progress</p>
+
+            <div class="history-controls" style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+                <button class="btn" onclick="showAllHistory()" id="allHistoryBtn">All Activities</button>
+                <button class="btn" onclick="showDictionaryHistory()" id="dictHistoryBtn">Dictionary Searches</button>
+                <button class="btn" onclick="showImageHistory()" id="imageHistoryBtn">Image Captions</button>
+                <button class="btn" onclick="showTTSHistory()" id="ttsHistoryBtn">Text-to-Speech</button>
+                <button class="btn" onclick="showProgressStats()" id="statsBtn">📈 Statistics</button>
+                <button class="btn" onclick="clearAllHistory()" style="background: linear-gradient(135deg, #e53e3e, #c53030);">🗑️ Clear All</button>
+            </div>
+
+            <div class="history-search-container" style="margin-bottom: 20px;">
+                <div class="search-container" style="max-width: 500px; margin: 0 auto; position: relative;">
+                    <input 
+                        type="text" 
+                        id="historySearch" 
+                        class="search-input" 
+                        placeholder="Search your learning history... (e.g., 你好, image, tts)"
+                        onkeypress="handleHistorySearch(event)"
+                        oninput="filterHistoryBySearch()"
+                    >
+                    <button class="search-btn" onclick="filterHistoryBySearch()">🔍</button>
+                    <button class="search-btn" onclick="clearHistorySearch()" style="right: 50px; background: linear-gradient(135deg, #e53e3e, #c53030);">✕</button>
+                </div>
+                <div style="text-align: center; margin-top: 10px;">
+                    <small style="color: #718096;">Search by Chinese characters, pinyin, English words, or activity type (dictionary, image, tts)</small>
+                </div>
+            </div>
+
+            <div class="history-stats" id="historyStats" style="display: none; background: rgba(247, 250, 252, 0.8); padding: 20px; border-radius: 15px; margin-bottom: 20px; backdrop-filter: blur(10px);">
+                <h3 style="margin-bottom: 15px; color: #2d3748;">Your Learning Statistics</h3>
+                <div id="statsContent"></div>
+            </div>
+
+            <div class="history-content" id="historyContent">
+                <div class="history-list" id="historyList">
+                    <p style="color: #a0aec0; text-align: center; padding: 40px;">Your learning history will appear here. Start using the features to build your progress!</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="js/app.js"></script>
 </body>
